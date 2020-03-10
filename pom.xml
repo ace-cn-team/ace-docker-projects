@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ace-projects</artifactId>
+        <groupId>org.ace</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ace-docker-projects</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>ace-docker-mysql80</module>
+        <module>ace-docker-redis</module>
+        <module>ace-docker-nacos-registry</module>
+        <module>ace-docker-dnsmasq</module>
+        <module>ace-docker-envirment</module>
+        <module>ace-docker-environment</module>
+        <module>ace-docker-vpn</module>
+    </modules>
+
+
+</project>
