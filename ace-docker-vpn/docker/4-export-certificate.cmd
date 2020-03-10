@@ -1,0 +1,1 @@
+docker run -v %~dp0../data/openvpn:/etc/openvpn --rm kylemanna/openvpn:2.4 ovpn_getclient caspar > %~dp0../data/openvpn/caspar.ovpn
