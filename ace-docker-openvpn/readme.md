@@ -1,7 +1,9 @@
-## 1-generate-conf.cmd
+## all-generate.cm
+   - 1 
+   
     生成配置文件（39.104.162.245这个ip是我当前服务器的公网IP）
-
-## 2-generate-secret-key.cmd
+   - 2
+    
     需要管理员权限
     生成密钥文件
     输入私钥密码（输入时是看不见的）：
@@ -12,13 +14,17 @@
     Common Name (eg: your user, host, or server name) [Easy-RSA CA]:
     输入刚才设置的私钥密码（输入完成后会再让输入一次）
     Enter pass phrase for /etc/openvpn/pki/private/ca.key:12345678
+   
+   - 3
     
-## 3-generate-client-certificate.cmd
     需要管理员权限
     生成客户端证书（这里的whsir改成你想要的名字）
     输入刚才设置的密码
     Enter pass phrase for /etc/openvpn/pki/private/ca.key:12345678
  
-## 4.export-certificate.cmd
+   - 4
+   
     导出客户端配置
     
+## start-openvpn-service.cmd
+    启动docker openvpn服务

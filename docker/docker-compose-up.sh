@@ -1,0 +1,1 @@
+docker-compose -f /caspar/ace-docker-projects/docker/docker-compose.yml up -d
