@@ -16,8 +16,14 @@
         <module>ace-docker-redis</module>
         <module>ace-docker-nacos-registry</module>
         <module>ace-docker-dnsmasq</module>
+<<<<<<< HEAD
         <module>ace-docker-environment</module>
         <module>ace-docker-openvpn</module>
+=======
+        <module>ace-docker-envirment</module>
+        <module>ace-docker-environment</module>
+        <module>ace-docker-vpn</module>
+>>>>>>> 34104edd8ce6ca1a2805f2360b5ee022c51c552a
     </modules>
 
 

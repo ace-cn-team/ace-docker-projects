@@ -1,0 +1,1 @@
+docker run -v %~dp0../data/openvpn:/etc/openvpn --rm -it kylemanna/openvpn:2.4 easyrsa build-client-full caspar nopass
