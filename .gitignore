@@ -1,0 +1,15 @@
+/ace-docker-openvpn/ace-docker-openvpn.iml
+/ace-docker-projects.iml
+/ace-docker-dnsmasq/ace-docker-dnsmasq.iml
+/ace-docker-environment/ace-docker-environment.iml
+/ace-docker-redis/ace-docker-redis.iml
+/ace-docker-nacos-registry/ace-docker-nacos-registry.iml
+/ace-docker-mysql80/ace-docker-mysql80.iml
+/desktop.ini
+/.idea
+/ace-docker-openvpn/data/openvpn/ccd
+/ace-docker-openvpn/data/openvpn/pki
+/ace-docker-openvpn/data/openvpn/caspar.ovpn
+/ace-docker-openvpn/data/openvpn/crl.pem
+/ace-docker-openvpn/data/openvpn/openvpn.conf
+/ace-docker-openvpn/data/openvpn/ovpn_env.sh
