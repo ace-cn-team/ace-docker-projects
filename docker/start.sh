@@ -17,3 +17,8 @@ echo "server_id:${server_id}"
 source ${openvpn_docker_script_dir}/init-openvpn-env.sh ${openvpn_data_dir} ${server_id}
 #
 #
+# 添加开放端口
+firewall-cmd --add-port=10001/tcp --permanent
+firewall-cmd --add-port=8080/tcp --permanent
+# 重启防火墙
+systemctl restart firewalld.service

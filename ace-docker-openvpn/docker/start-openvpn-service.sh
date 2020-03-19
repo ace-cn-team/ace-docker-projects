@@ -1,6 +1,6 @@
 script_abs=$(readlink -f "$0")
 script_dir=$(dirname $script_abs)
-host_dir="${script_dir}/../data/openvpn"
+host_dir="${script_dir}/../data/openvpn"dock
 echo "host_dir:${host_dir}"
 docker run \
 --net host \
