@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  mysql8:
+    image: mysql:8.0.19
+    container_name: ace-mysql8
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_MYSQL_IP}
+    dns:
+      - ${ACE_DNS_IP}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ACE_DOCKER_MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}

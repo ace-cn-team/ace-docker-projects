@@ -64,4 +64,4 @@ networks:
   ace-network:
     ipam:
       config:
-        - subnet: "172.18.0.0/16"
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}

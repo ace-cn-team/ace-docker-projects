@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  ace-registry-nacos:
+    image: nacos/nacos-server:1.1.4
+    container_name: ace-registry-nacos
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_REGISTRY_IP}
+    dns:
+      - ${ACE_DNS_IP}
+    environment:
+      MODE: ${ACE_REGISTRY_MODE}
+    ports:
+      - 8848:8848
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}

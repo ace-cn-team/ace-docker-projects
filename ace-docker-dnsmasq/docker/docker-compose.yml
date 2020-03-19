@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  ##
+  # 基础服务
+  ##
+  # dns 服务
+  dns: # 容器名字
+    image: jpillora/dnsmasq:1 #表示使用  镜像
+    container_name: ace-dns
+#    network_mode: host
+    networks:
+      ace-network:
+         ipv4_address: ${ACE_DNS_IP}
+    dns:
+      - 127.0.0.1
+#    ports:
+#      - 53:53 # 将内部的 端口 映射到外部的 端口
+#      - 10001:8080
+    volumes:
+      - ${ACE_DOCKER_DNS_MASQ_CONF_FILE_PATH}:/etc/dnsmasq.conf:rw # 将同文件夹下的 data 目录 “挂载” 到内部 Ghost 数据目录
+    environment:
+      - HTTP_USER=${ACE_DOCKER_DNS_HTTP_USER}
+      - HTTP_PASS=${ACE_DOCKER_DNS_HTTP_PASS}
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
