@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  ace-jenkins:
+    image: jenkins/jenkins:jdk11
+    container_name: ace-jenkins
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_JENKINS_IP}
+    dns:
+      - ${ACE_DNS_IP}
+    user: root
+    volumes:
+      - ${ACE_JENKINS_DATA_DIR}:/var/jenkins_home:rw
+    environment:
+      JAVA_OPTS: -Djava.util.logging.config.file=/var/jenkins_home/log.properties
+#    ports:
+#      - 8080:8080
+#      - 50000:50000
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
