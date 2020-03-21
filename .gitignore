@@ -13,3 +13,4 @@
 /ace-docker-openvpn/data/openvpn/crl.pem
 /ace-docker-openvpn/data/openvpn/openvpn.conf
 /ace-docker-openvpn/data/openvpn/ovpn_env.sh
+/ace-docker-jenkins/ace-docker-jenkins.iml
