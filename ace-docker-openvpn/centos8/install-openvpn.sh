@@ -9,3 +9,4 @@ git clone https://github.com/Nyr/openvpn-install.git
 cd openvpn-install/
 chmod +x openvpn-install.sh
 ./openvpn-install.sh
+firewall-cmd --add-masquerade --permanent

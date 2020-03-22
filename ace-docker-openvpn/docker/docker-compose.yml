@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+    # openvpn服务
+  openvpn:
+    image: kylemanna/openvpn:2.4
+    container_name: ace-openvpn
+#    network_mode: host
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_OPENVPN_IP}
+    dns:
+      - ${ACE_DNS_IP}
+    ports:
+      - 1194:1194
+    volumes:
+      - ${ACE_DOCKER_OPEN_VPN_DIR_PATH}:/etc/openvpn:rw
+    privileged: true
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
