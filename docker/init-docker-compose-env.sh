@@ -14,4 +14,5 @@ export ACE_REGISTRY_MODE=standalone
 export ACE_REDIS_COMMON_IP=172.18.0.3
 export ACE_JENKINS_IP=172.18.0.6
 export ACE_JENKINS_DATA_DIR=${ACE_DOCKER_BASE_DIR}/../ace-docker-jenkins/data
+export ACE_NEXUS3_IP=172.18.0.7
 export ACE_PROJECT_SUB_NETWORK="172.18.0.0/16"

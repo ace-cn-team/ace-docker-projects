@@ -19,6 +19,7 @@
         <module>ace-docker-environment</module>
         <module>ace-docker-openvpn</module>
         <module>ace-docker-jenkins</module>
+        <module>ace-docker-nexus3</module>
     </modules>
 
 
