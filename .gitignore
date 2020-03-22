@@ -14,3 +14,4 @@
 /ace-docker-openvpn/data/openvpn/openvpn.conf
 /ace-docker-openvpn/data/openvpn/ovpn_env.sh
 /ace-docker-jenkins/ace-docker-jenkins.iml
+/ace-docker-nexus3/ace-docker-nexus3.iml

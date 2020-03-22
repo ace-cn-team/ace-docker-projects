@@ -10,12 +10,14 @@ services:
         ipv4_address: ${ACE_MYSQL_IP}
     dns:
       - ${ACE_DNS_IP}
+#    volumes:
+#      - ${ACE_MYSQL_DATA_DIR}:/var/lib/mysql # 将同文件夹下的 data 目录 “挂载” 到内部 Ghost 数据目录
     volumes:
-      - ${ACE_MYSQL_DATA_DIR}:/var/lib/mysql # 将同文件夹下的 data 目录 “挂载” 到内部 Ghost 数据目录
+      - ace-mysql:/var/lib/mysql # 将同文件夹下的 data 目录 “挂载” 到内部 Ghost 数据目录
     environment:
       MYSQL_ROOT_PASSWORD: ${ACE_DOCKER_MYSQL_ROOT_PASSWORD}
-    ports:
-      - 3306:3306
+#    ports:
+#      - 3306:3306
     restart: always # 如果容器内应用退出了，尝试重启
 
 networks:
@@ -23,3 +25,6 @@ networks:
     ipam:
       config:
         - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-mysql:

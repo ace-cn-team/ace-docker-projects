@@ -1,6 +1,6 @@
 # docker-compose环境变量设置文件
 # docker-compose文件绝对路径
-export ACE_DOCKER_BASE_DIR=/caspar/ace-docker-projects/docker
+export ACE_DOCKER_BASE_DIR=/ace/ace-docker-projects/docker
 export ACE_DOCKER_DNS_HTTP_USER=admin
 export ACE_DOCKER_DNS_HTTP_PASS=admin
 export ACE_DOCKER_DNS_MASQ_CONF_FILE_PATH=${ACE_DOCKER_BASE_DIR}/../ace-docker-dnsmasq/data/dnsmasq.conf
