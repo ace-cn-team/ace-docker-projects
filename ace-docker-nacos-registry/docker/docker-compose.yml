@@ -11,8 +11,8 @@ services:
       - ${ACE_DNS_IP}
     environment:
       MODE: ${ACE_REGISTRY_MODE}
-    ports:
-      - 8848:8848
+#    ports:
+#      - 8848:8848
     restart: always # 如果容器内应用退出了，尝试重启
 
 networks:

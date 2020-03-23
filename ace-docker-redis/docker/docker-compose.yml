@@ -9,8 +9,8 @@ services:
         ipv4_address: ${ACE_REDIS_COMMON_IP}
     dns:
       - ${ACE_DNS_IP}
-    ports:
-      - 6379:6379
+#    ports:
+#      - 6379:6379
     restart: always # 如果容器内应用退出了，尝试重启
 
 networks:
