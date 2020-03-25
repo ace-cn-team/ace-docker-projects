@@ -11,7 +11,7 @@ services:
       - ${ACE_DNS_IP}
     user: root
     volumes:
-      - ${ACE_JENKINS_DATA_DIR}:/var/jenkins_home:rw
+      - ace-jenkins:/var/jenkins_home:rw
     environment:
       JAVA_OPTS: -Djava.util.logging.config.file=/var/jenkins_home/log.properties
 #    ports:
@@ -21,6 +21,10 @@ services:
 
 networks:
   ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
     ipam:
       config:
         - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-jenkins:

@@ -18,4 +18,6 @@ export ACE_JENKINS_DATA_DIR=${ACE_DOCKER_BASE_DIR}/../ace-docker-jenkins/data
 export ACE_NEXUS3_IP=172.18.0.7
 export ACE_XXL_JOB_APPLICATION_PROPERTIES_PATH=${ACE_DOCKER_BASE_DIR}/../ace-docker-xxl-job-admin/data/application.properties
 export ACE_XXL_JOB_IP=172.18.0.8
+export ACE_ACCOUNT_BASE_API_WEB_IP=172.18.10.1
+export ACE_PROJECT_SUB_NETWORK_NAME=docker_ace-network
 export ACE_PROJECT_SUB_NETWORK="172.18.0.0/16"

@@ -20,6 +20,7 @@ services:
 
 networks:
   ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
     ipam:
       config:
         - subnet: ${ACE_PROJECT_SUB_NETWORK}
