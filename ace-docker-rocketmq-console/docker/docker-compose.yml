@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  ace-rocketmq-console:
+    image: styletang/rocketmq-console-ng:1.0.0
+    container_name: ace-rocketmq-console
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_ROCKETMQ_CONSOLE_IP}
+    dns:
+      - ${ACE_DNS_IP}
+#    ports:
+#      - 8080:8080
+    restart: always # 如果容器内应用退出了，尝试重启
+    environment:
+      - JAVA_OPTS= -Dlogging.level.root=info -Drocketmq.namesrv.addr=rocketmq-namesrv.ace.com:9876
+      - Dcom.rocketmq.sendMessageWithVIPChannel=false
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}

@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  ace-rocketmq-namesrv:
+    image: rocketmqinc/rocketmq:4.3.2
+    container_name: ace-rocketmq-namesrv
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_ROCKETMQ_NAMESRV_IP}
+    dns:
+      - ${ACE_DNS_IP}
+#    ports:
+#      - 9876:9876
+    restart: always # 如果容器内应用退出了，尝试重启
+    volumes:
+      - ace-rocketmq-namesrv:/home/rocketmq
+    command: sh mqnamesrv
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-rocketmq-namesrv:

@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  ace-rocketmq-namesrv:
+    image: foxiswho/rocketmq:4.7.0
+    container_name: ace-rocketmq-namesrv
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_ROCKETMQ_NAMESRV_IP}
+    dns:
+      - ${ACE_DNS_IP}
+#    ports:
+#      - 9876:9876
+    restart: always # 如果容器内应用退出了，尝试重启
+    environment:
+      JAVA_OPT_EXT: "-Duser.home=/ace/rocketmq-namesrv -Xms128m -Xmx256m -Xmn256m"
+
+    volumes:
+      - ace-rocketmq-namesrv:/ace/rocketmq-namesrv
+    command: ["sh","mqnamesrv"]
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-rocketmq-namesrv:
+    name: ace-roc

@@ -21,6 +21,9 @@
         <module>ace-docker-jenkins</module>
         <module>ace-docker-nexus3</module>
         <module>ace-docker-xxl-job-admin</module>
+        <module>ace-docker-rocketmq-namesrv</module>
+        <module>ace-docker-rocketmq-broker</module>
+        <module>ace-docker-rocketmq-console</module>
     </modules>
 
 

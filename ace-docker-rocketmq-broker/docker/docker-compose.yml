@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  ace-rocketmq-broker:
+    image: foxiswho/rocketmq:4.7.0
+    container_name: ace-rocketmq-broker
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_ROCKETMQ_BROKER_IP}
+    dns:
+      - ${ACE_DNS_IP}
+    #    ports:
+    #      - 10909:10909
+    #      - 10911:10911
+    #      - 10912:10912
+    restart: always # 如果容器内应用退出了，尝试重启
+    volumes:
+      - ace-rocketmq-broker:/ace/rocketmq-broker
+      - ${ACE_DOCKER_BASE_DIR}/../ace-docker-rocketmq-broker/data/runbroker.sh:/home/rocketmq/rocketmq-4.7.0/bin/runbroker.sh
+      - ${ACE_ROCKETMQ_BROKER_CONF_PATH}:/etc/rocketmq/broker.conf
+   # environment:
+      # - NAMESRV_ADDR=rocketmq-namesrv.ace.com:9876
+      #JAVA_OPT_EXT: "-Duser.home=/ace/rocketmq-broker"
+     #command: ["sh","mqbroker","-c","/etc/rocketmq/broker.conf","-n","rocketmq-namesrv.ace.com:9876"]
+    command: sh mqbroker -n rocketmq-namesrv.ace.com:9876 -c /etc/rocketmq/broker.conf
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-rocketmq-broker:
+    name: ace-rocketmq-broker

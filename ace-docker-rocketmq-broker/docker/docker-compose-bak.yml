@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  ace-rocketmq-broker:
+    image: rocketmqinc/rocketmq:4.3.2
+    container_name: ace-rocketmq-broker
+    networks:
+      ace-network:
+        ipv4_address: ${ACE_ROCKETMQ_BROKER_IP}
+    dns:
+      - ${ACE_DNS_IP}
+#    ports:
+#      - 10909:10909
+#      - 10911:10911
+#      - 10912:10912
+    restart: always # 如果容器内应用退出了，尝试重启
+    volumes:
+      - ace-rocketmq-broker:/home/rocketmq
+      - ${ACE_ROCKETMQ_BROKER_CONF_PATH}:/opt/rocketmq-4.3.2/conf/broker.conf
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/jre
+    command: sh mqbroker -c /opt/rocketmq-4.3.2/conf/broker.conf -n rocketmq-namesrv.ace.com:9876
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
+
+volumes:
+  ace-rocketmq-broker:
+    name: ace-rocketmq-broker
