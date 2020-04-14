@@ -16,3 +16,6 @@
 /ace-docker-jenkins/ace-docker-jenkins.iml
 /ace-docker-nexus3/ace-docker-nexus3.iml
 /ace-docker-xxl-job-admin/ace-docker-xxl-job-admin.iml
+/ace-docker-rocketmq-broker/ace-docker-rocketmq-broker.iml
+/ace-docker-rocketmq-console/ace-docker-rocketmq-console.iml
+/ace-docker-rocketmq-namesrv/ace-docker-rocketmq-namesrv.iml
