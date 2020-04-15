@@ -24,6 +24,8 @@
         <module>ace-docker-rocketmq-namesrv</module>
         <module>ace-docker-rocketmq-broker</module>
         <module>ace-docker-rocketmq-console</module>
+        <module>ace-docker-service-projects</module>
+        <module>ace-docker-ace-account-base-api-web</module>
     </modules>
 
 

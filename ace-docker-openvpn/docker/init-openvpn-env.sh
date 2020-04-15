@@ -1,8 +1,13 @@
 #!/bin/bash
+# 输入参数：环境参数脚本绝对路径
 param_script_abs=${1}
+# 获取当前脚本绝对路径
 script_abs=$(readlink -f "$0")
+# 获取配置数据目录路径
 tmp_script_dir="$(dirname ${script_abs})/../data/openvpn"
+# 输入参数：服务器绑定的IP
 param_tmp_server_id=${2}
+# 获取服务器默认IP地址
 tmp_server_id=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d '/')
 # 基础目录路径
 data_dir=${param_script_abs:=${tmp_script_dir}}
