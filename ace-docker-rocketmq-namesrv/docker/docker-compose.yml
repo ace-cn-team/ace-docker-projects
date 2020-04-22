@@ -18,7 +18,14 @@ services:
     volumes:
       - ace-rocketmq-namesrv:/ace/rocketmq-namesrv
     command: ["sh","mqnamesrv"]
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
 networks:
   ace-network:
     name: ${ACE_PROJECT_SUB_NETWORK_NAME}

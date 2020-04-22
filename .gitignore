@@ -19,3 +19,6 @@
 /ace-docker-rocketmq-broker/ace-docker-rocketmq-broker.iml
 /ace-docker-rocketmq-console/ace-docker-rocketmq-console.iml
 /ace-docker-rocketmq-namesrv/ace-docker-rocketmq-namesrv.iml
+/ace-docker-service-projects/ace-docker-service-projects.iml
+/ace-docker-service-projects/ace-account-cas-base-api-web/ace-account-cas-base-api-web.iml
+/ace-server-projects/ace-server-projects.iml

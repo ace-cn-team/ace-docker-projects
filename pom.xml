@@ -26,6 +26,9 @@
         <module>ace-docker-rocketmq-console</module>
         <module>ace-docker-service-projects</module>
         <module>ace-docker-ace-account-base-api-web</module>
+        <module>ace-docker-portainer</module>
+        <module>ace-server-projects</module>
+        <module>ace-centos7-k8s-master</module>
     </modules>
 
 

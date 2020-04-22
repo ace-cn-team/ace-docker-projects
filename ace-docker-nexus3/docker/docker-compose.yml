@@ -14,7 +14,14 @@ services:
     ports:
       - 8081:8081
     restart: always # 如果容器内应用退出了，尝试重启
-
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
 networks:
   ace-network:
     name: ${ACE_PROJECT_SUB_NETWORK_NAME}

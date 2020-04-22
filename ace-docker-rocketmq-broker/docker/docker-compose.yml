@@ -23,7 +23,14 @@ services:
       #JAVA_OPT_EXT: "-Duser.home=/ace/rocketmq-broker"
      #command: ["sh","mqbroker","-c","/etc/rocketmq/broker.conf","-n","rocketmq-namesrv.ace.com:9876"]
     command: sh mqbroker -n rocketmq-namesrv.ace.com:9876 -c /etc/rocketmq/broker.conf
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
 networks:
   ace-network:
     name: ${ACE_PROJECT_SUB_NETWORK_NAME}
