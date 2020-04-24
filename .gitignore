@@ -22,3 +22,14 @@
 /ace-docker-service-projects/ace-docker-service-projects.iml
 /ace-docker-service-projects/ace-account-cas-base-api-web/ace-account-cas-base-api-web.iml
 /ace-server-projects/ace-server-projects.iml
+/ace-docker-projects/ace-docker-dnsmasq/ace-docker-dnsmasq.iml
+/ace-docker-projects/ace-docker-nexus3/ace-docker-nexus3.iml
+/ace-docker-projects/ace-docker-mysql80/ace-docker-mysql80.iml
+/ace-docker-projects/ace-docker-jenkins/ace-docker-jenkins.iml
+/ace-docker-projects/ace-docker-environment/ace-docker-environment.iml
+/ace-docker-projects/ace-docker-xxl-job-admin/ace-docker-xxl-job-admin.iml
+/ace-docker-projects/ace-docker-rocketmq-namesrv/ace-docker-rocketmq-namesrv.iml
+/ace-docker-projects/ace-docker-rocketmq-console/ace-docker-rocketmq-console.iml
+/ace-docker-projects/ace-docker-rocketmq-broker/ace-docker-rocketmq-broker.iml
+/ace-docker-projects/ace-docker-redis/ace-docker-redis.iml
+/ace-docker-projects/ace-docker-openvpn/ace-docker-openvpn.iml
