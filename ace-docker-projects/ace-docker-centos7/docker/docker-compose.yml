@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  ace-cento7: # 容器名字
+    image:  centos:7.7.1908 #表示使用  镜像
+    container_name: ace-centos7
+#    network_mode: host
+    networks:
+      ace-network:
+         ipv4_address: ${ACE_CENTOS7}
+#    dns:
+#      - ${ACE_DNS_IP}
+    volumes:
+      - ace-centos
+#    ports:
+#      - 53:53 # 将内部的 端口 映射到外部的 端口
+#      - 10001:8080
+    restart: always # 如果容器内应用退出了，尝试重启
+    stdin_open: true
+    tty: true
+    entrypoint: /usr/sbin/init
+volumes:
+  ace-centos:
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}

@@ -17,9 +17,10 @@ update-alternatives --set iptables /usr/sbin/iptables-legacy
 #
 # 安装docker
 yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-yum install -y dnf
-dnf install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
-dnf install -y docker-ce
+#yum install -y dnf
+#dnf install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
+#dnf install -y docker-ce
+yum -y install docker-ce-18.03.1.ce-1.el7.centos
 systemctl enable docker.service
 systemctl start docker.service
 #
@@ -48,11 +49,6 @@ gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg http://mirrors.a
 EOF
 #
 #
-yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-#
-systemctl enable --now kubelet
-systemctl start kubelet
-#
 # 处理翻墙下载镜像的问题
 docker pull gotok8s/kube-apiserver:v1.18.2
 docker pull gotok8s/kube-controller-manager:v1.18.2
@@ -70,22 +66,32 @@ docker tag docker.io/gotok8s/pause:3.2 k8s.gcr.io/pause:3.2
 docker tag docker.io/gotok8s/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0
 docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 #
-kubeadm init
-# root user run this
-export KUBECONFIG=/etc/kubernetes/admin.conf
-# 安装 k8s weave网络管理插件（有其它网络插件选择）。创建时间比较长
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
-kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-# 检查网络是否创建成功
-kubectl get pods --all-namespaces
-# 开启单机集群模式，默认关闭
-#kubectl taint nodes --all node-role.kubernetes.io/master-
-# 添加worker节点
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#join-nodes
 #
-#If you do not have the token, you can get it by running the following command on the control-plane node:
-#kubeadm token list
-#kubeadm token create
 #
-#If you don’t have the value of --discovery-token-ca-cert-hash, you can get it by running the following command chain on the control-plane node:
-#openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+# 查询指定版本 yum list kubelet --showduplicates | sort -r
+# 自动安装kubeadm kubelet kubectl
+yum install -y kubeadm-1.18.2-0
+# 安装shell命令自动补全功能clu
+yum install bash-completion -y
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+systemctl enable kubelet
+systemctl start kubelet
+#
+# 把节点添加到master节点中
+kubeadm join 172.1.0.1:6443 --token 8yy4dw.fswmd6pozfhc4vzk \
+    --discovery-token-ca-cert-hash sha256:a1d5a11a2bd266194aa90691d24f2efb63f5558d7b7c728e1c0ef3a7832d4908
+# 启动不成功，如果是网络问题，kubelet.go:2187] Container runtime network not ready: NetworkReady=false reaeady: cni config uninitialized
+# scp -r 172.1.0.1:/etc/cni /etc
+# scp 172.1.0.1:/opt/cni/bin/weave-plugin-2.6.2  ./
+# scp 172.1.0.1:/opt/cni/bin/weave-ipam  ./
+# scp 172.1.0.1:/opt/cni/bin/weave-net  ./
+# scp 172.1.0.1://etc/kubernetes/admin.conf /etc/kubernetes/admin.conf
+# 重启kubelet
+# systemctl restart kubelet
+# 回到master 节点查看 状态 仍然是notready （一般情况，重启服务，需要等他反应，好吧，我们等几分钟）
+# 始终看不到 status  ready
+# 回到 node节点
+# 再次使用
+# journalctl -f -u kubelet
+
+

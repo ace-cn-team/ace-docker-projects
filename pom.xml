@@ -29,6 +29,7 @@
         <module>ace-docker-portainer</module>
         <module>ace-server-projects</module>
         <module>ace-centos7-k8s-master</module>
+        <module>ace-k8s-projects</module>
     </modules>
 
 
