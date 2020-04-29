@@ -2,6 +2,23 @@
 # centos7 安装 k8s v1.18.2 master节点脚本
 # https://kubernetes.io/zh/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 #
+#
+## 载入公钥
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+## 安装 ELRepo 最新版本
+yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+## 列出可以使用的 kernel 包版本
+#yum list available --disablerepo=* --enablerepo=elrepo-kernel
+## 安装指定的 kernel 版本：
+yum install -y kernel-lt-4.4.220-1.el7.elrepo --enablerepo=elrepo-kernel
+## 查看系统可用内核
+cat /boot/grub2/grub.cfg | grep menuentry
+## 设置开机从新内核启动
+grub2-set-default "CentOS Linux (4.4.220-1.el7.elrepo.x86_64) 7 (Core)"
+## 查看内核启动项
+grub2-editenv list
+#saved_entry=CentOS Linux (4.4.218-1.el7.elrepo.x86_64) 7 (Core)
+#
 # 禁用firewall
 systemctl stop firewalld.service
 systemctl disable firewalld.service
@@ -20,7 +37,25 @@ yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/
 #yum install -y dnf
 #dnf install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
 #dnf install -y docker-ce
-yum -y install docker-ce-18.03.1.ce-1.el7.centos
+# yum list docker-ce --showduplicates | sort -r
+yum -y install docker-ce-19.03.3-3.el7
+
+# Setup daemon.
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+systemctl daemon-reload
+systemctl restart docker
 systemctl enable docker.service
 systemctl start docker.service
 #
@@ -36,6 +71,17 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 sysctl --system
+#
+# 开启IPVS服务
+yum -y install ipvsadm  ipset
+# 永久生效
+cat > /etc/sysconfig/modules/ipvs.modules <<EOF
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+EOF
 #
 # 安装k8s镜像使用阿里云
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
@@ -77,20 +123,12 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc
 systemctl enable kubelet
 systemctl start kubelet
 #
-#
+# https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/
 kubeadm init \
 --apiserver-advertise-address=172.1.0.1 \
 --apiserver-bind-port=6443 \
---service-cidr 10.96.0.0/16
-#
-# root user run this
-export KUBECONFIG=/etc/kubernetes/admin.conf
-# 安装 k8s weave网络管理插件（有其它网络插件选择）。创建时间比较长
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
-kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-# 检查网络是否创建成功
-kubectl get pods --all-namespaces
-
+--pod-network-cidr=11.8.0.0/16
+#--service-cidr 10.96.0.0/16
 
 # kubeadm init 参数
 # --apiserver-advertise-address string
@@ -144,7 +182,38 @@ kubectl get pods --all-namespaces
 #   令牌被自动删除之前的持续时间（例如 1 s，2 m，3 h）。如果设置为 '0'，则令牌将永不过期
 # --upload-certs
 #   将控制平面证书上传到 kubeadm-certs Secret。
-
+#
+#
+#
+# root user run this
+export KUBECONFIG=/etc/kubernetes/admin.conf
+# 使用IPVS
+kubectl edit configmap kube-proxy -n kube-system
+# 安装 k8s weave网络管理插件（有其它网络插件选择）。创建时间比较长
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
+# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+# Please follow the steps to install Kubernetes cluster with Kubeadm,
+# however must specify --pod-network-cidr when you run kubeadm init.
+# Kube-router relies on kube-controller-manager to allocate pod CIDR for the nodes.
+# Kube-router provides pod networking, network policy and high perfoming IPVS/LVS based service proxy.
+# Depending on you choose to use kube-router for service proxy you have two options.
+#
+# 以下两种部署方式任选其一
+#
+# 1. 只启用 pod网络通信，网络隔离策略 功能
+kubectl apply -f kubeadm-kuberouter.yaml
+#
+# 2. 启用 pod网络通信，网络隔离策略，服务代理 所有功能
+# 删除kube-proxy和其之前配置的服务代理
+#kubectl apply -f kubeadm-kuberouter-all-features.yaml
+#kubectl -n kube-system delete ds kube-proxy
+# 在每个节点上执行
+#docker run --privileged --net=host registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy-amd64:v1.10.2 kube-proxy --cleanup
+# 查看
+kubectl get pods --namespace kube-system
+kubectl get svc --namespace kube-system
+# 检查网络是否创建成功
+kubectl get pods --all-namespaces
 #
 #
 #
@@ -167,3 +236,12 @@ kubectl get pods --all-namespaces
 #
 # If you don’t have the value of --discovery-token-ca-cert-hash, you can get it by running the following command chain on the control-plane node:
 # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+#
+# 卸载
+# kubeadm reset -f && yum remove -y kubeadm.x86_64 kubectl.x86_64 kubectl.x86_64 kubernetes-cni.x86_64
+# journalctl -f -u kubelet
+
+##
+kubeadm join 172.1.0.1:6443 --token 4w1x93.spxeidggz15nr1lh \
+    --discovery-token-ca-cert-hash sha256:e9751b6ca5db647ca2ff6577b56ed080529d401b6ad5d9f3d949de86b127d2d9
+#

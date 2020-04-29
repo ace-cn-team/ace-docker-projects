@@ -20,7 +20,25 @@ yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/
 #yum install -y dnf
 #dnf install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
 #dnf install -y docker-ce
-yum -y install docker-ce-18.03.1.ce-1.el7.centos
+# yum list docker-ce --showduplicates | sort -r
+yum -y install docker-ce-19.03.3-3.el7
+
+# Setup daemon.
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+systemctl daemon-reload
+systemctl restart docker
 systemctl enable docker.service
 systemctl start docker.service
 #
@@ -78,8 +96,8 @@ systemctl enable kubelet
 systemctl start kubelet
 #
 # 把节点添加到master节点中
-kubeadm join 172.1.0.1:6443 --token 8yy4dw.fswmd6pozfhc4vzk \
-    --discovery-token-ca-cert-hash sha256:a1d5a11a2bd266194aa90691d24f2efb63f5558d7b7c728e1c0ef3a7832d4908
+kubeadm join 172.1.0.1:6443 --token tun8oz.1os3sqok5vrd08mw \
+    --discovery-token-ca-cert-hash sha256:6b3cfd76af6fc790a8df16fce258e10b9c4b12e345430b055581669e8c66378b
 # 启动不成功，如果是网络问题，kubelet.go:2187] Container runtime network not ready: NetworkReady=false reaeady: cni config uninitialized
 # scp -r 172.1.0.1:/etc/cni /etc
 # scp 172.1.0.1:/opt/cni/bin/weave-plugin-2.6.2  ./
