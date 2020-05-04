@@ -125,7 +125,7 @@ systemctl start kubelet
 #
 # https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/
 kubeadm init \
---apiserver-advertise-address=172.1.0.1 \
+--apiserver-advertise-address=172.1.0.2 \
 --apiserver-bind-port=6443 \
 --pod-network-cidr=11.8.0.0/16
 #--service-cidr 10.96.0.0/16
@@ -189,6 +189,9 @@ kubeadm init \
 export KUBECONFIG=/etc/kubernetes/admin.conf
 # 使用IPVS
 kubectl edit configmap kube-proxy -n kube-system
+# 配置IPVS模式之后，删除之前所有的kube-proxy pod,重新启动
+#
+#
 # 安装 k8s weave网络管理插件（有其它网络插件选择）。创建时间比较长
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 # kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
@@ -242,6 +245,8 @@ kubectl get pods --all-namespaces
 # journalctl -f -u kubelet
 
 ##
-kubeadm join 172.1.0.1:6443 --token 4w1x93.spxeidggz15nr1lh \
-    --discovery-token-ca-cert-hash sha256:e9751b6ca5db647ca2ff6577b56ed080529d401b6ad5d9f3d949de86b127d2d9
+
+kubeadm join 172.1.0.2:6443 --token vzag2r.eywbupo7wcro5hbp \
+    --discovery-token-ca-cert-hash sha256:e92f0cd4dec73cab4af6a0e81b24d5ea9b1adbdd269d58447019063a32b5df85
+
 #

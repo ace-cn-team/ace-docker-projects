@@ -1,0 +1,1 @@
+docker run --name="ace-rancher" -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher:v2.4.3-rc5
