@@ -1,0 +1,25 @@
+nodes:
+  - address: 172.1.0.2
+    #internal_address: 172.16.22.12
+    user: rancher
+    #ssh_key_path: /root/id_rsa
+    #ssh_cert_path: /root/id_rsa.pub
+    role: [controlplane, worker, etcd]
+  - address: 172.1.0.3
+    #internal_address: 172.16.32.37
+    user: rancher
+    #ssh_key: root
+    role: [worker]
+
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24
+
+# Required for external TLS termination with
+# ingress-nginx v0.22+
+ingress:
+  provider: nginx
+  options:
+    use-forwarded-headers: "true"

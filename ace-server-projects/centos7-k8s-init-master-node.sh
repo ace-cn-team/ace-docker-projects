@@ -10,22 +10,26 @@ yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 ## 列出可以使用的 kernel 包版本
 #yum list available --disablerepo=* --enablerepo=elrepo-kernel
 ## 安装指定的 kernel 版本：
-yum install -y kernel-lt-4.4.220-1.el7.elrepo --enablerepo=elrepo-kernel
+yum install -y kernel-lt-4.4.222-1.el7.elrepo --enablerepo=elrepo-kernel
 ## 查看系统可用内核
 cat /boot/grub2/grub.cfg | grep menuentry
 ## 设置开机从新内核启动
-grub2-set-default "CentOS Linux (4.4.220-1.el7.elrepo.x86_64) 7 (Core)"
+grub2-set-default "CentOS Linux (4.4.222-1.el7.elrepo.x86_64) 7 (Core)"
 ## 查看内核启动项
 grub2-editenv list
 #saved_entry=CentOS Linux (4.4.218-1.el7.elrepo.x86_64) 7 (Core)
+# 查看所有内核
+rpm -qa |grep kernel
+# 删除无用内核
+#
 #
 # 禁用firewall
-systemctl stop firewalld.service
+systemctl stop firewalld.service & \
 systemctl disable firewalld.service
 #
 # 安装iptables
-yum install -y iptables-services
-systemctl enable iptables
+yum install -y iptables-services & \
+systemctl enable iptables & \
 systemctl start iptables
 #
 # 确保 iptables 工具不使用 nftables 后端,
@@ -33,6 +37,7 @@ systemctl start iptables
 update-alternatives --set iptables /usr/sbin/iptables-legacy
 #
 # 安装docker
+# yum -y install yum-utils
 yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 #yum install -y dnf
 #dnf install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
@@ -41,6 +46,7 @@ yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/
 yum -y install docker-ce-19.03.3-3.el7
 
 # Setup daemon.
+mkdir -p /etc/docker
 cat > /etc/docker/daemon.json <<EOF
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
@@ -54,13 +60,21 @@ cat > /etc/docker/daemon.json <<EOF
   ]
 }
 EOF
-systemctl daemon-reload
-systemctl restart docker
-systemctl enable docker.service
+systemctl daemon-reload & \
+systemctl restart docker & \
+systemctl enable docker.service & \
 systemctl start docker.service
 #
+# 设置转发
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+#
 # 关闭swap,k8s安装限制
-swapoff -a
+#第二步修改配置文件 -
+# vim /etc/fstab
+#删除swap相关行 /mnt/swap swap swap defaults 0 0 这一行或者注释掉这一行
+echo "vm.swappiness = 0">> /etc/sysctl.conf
+swapoff -a & \
+sysctl -p
 #
 # 将 SELinux 设置为 permissive 模式（相当于将其禁用）
 setenforce 0
@@ -96,20 +110,20 @@ EOF
 #
 #
 # 处理翻墙下载镜像的问题
-docker pull gotok8s/kube-apiserver:v1.18.2
-docker pull gotok8s/kube-controller-manager:v1.18.2
-docker pull gotok8s/kube-scheduler:v1.18.2
-docker pull gotok8s/kube-proxy:v1.18.2
-docker pull gotok8s/pause:3.2
-docker pull gotok8s/etcd:3.4.3-0
+docker pull gotok8s/kube-apiserver:v1.18.2 && \
+docker pull gotok8s/kube-controller-manager:v1.18.2 && \
+docker pull gotok8s/kube-scheduler:v1.18.2 && \
+docker pull gotok8s/kube-proxy:v1.18.2 && \
+docker pull gotok8s/pause:3.2 &&\
+docker pull gotok8s/etcd:3.4.3-0 &&\
 docker pull gotok8s/coredns:1.6.7
 # 重命名
-docker tag docker.io/gotok8s/kube-apiserver:v1.18.2 k8s.gcr.io/kube-apiserver:v1.18.2
-docker tag docker.io/gotok8s/kube-controller-manager:v1.18.2 k8s.gcr.io/kube-controller-manager:v1.18.2
-docker tag docker.io/gotok8s/kube-scheduler:v1.18.2 k8s.gcr.io/kube-scheduler:v1.18.2
-docker tag docker.io/gotok8s/kube-proxy:v1.18.2 k8s.gcr.io/kube-proxy:v1.18.2
-docker tag docker.io/gotok8s/pause:3.2 k8s.gcr.io/pause:3.2
-docker tag docker.io/gotok8s/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0
+docker tag docker.io/gotok8s/kube-apiserver:v1.18.2 k8s.gcr.io/kube-apiserver:v1.18.2 && \
+docker tag docker.io/gotok8s/kube-controller-manager:v1.18.2 k8s.gcr.io/kube-controller-manager:v1.18.2 && \
+docker tag docker.io/gotok8s/kube-scheduler:v1.18.2 k8s.gcr.io/kube-scheduler:v1.18.2 && \
+docker tag docker.io/gotok8s/kube-proxy:v1.18.2 k8s.gcr.io/kube-proxy:v1.18.2 && \
+docker tag docker.io/gotok8s/pause:3.2 k8s.gcr.io/pause:3.2 && \
+docker tag docker.io/gotok8s/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0 && \
 docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 #
 #
@@ -118,14 +132,14 @@ docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 # 自动安装kubeadm kubelet kubectl
 yum install -y kubeadm-1.18.2-0
 # 安装shell命令自动补全功能clu
-yum install bash-completion -y
-echo "source <(kubectl completion bash)" >> ~/.bashrc
-systemctl enable kubelet
+yum install bash-completion -y && \
+echo "source <(kubectl completion bash)" >> ~/.bashrc && \
+systemctl enable kubelet && \
 systemctl start kubelet
 #
 # https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/
 kubeadm init \
---apiserver-advertise-address=172.1.0.2 \
+--apiserver-advertise-address=172.1.1.2 \
 --apiserver-bind-port=6443 \
 --pod-network-cidr=11.8.0.0/16
 #--service-cidr 10.96.0.0/16
@@ -187,10 +201,10 @@ kubeadm init \
 #
 # root user run this
 export KUBECONFIG=/etc/kubernetes/admin.conf
-# 使用IPVS
+# 使用IPVS,mode字段修改为"ipvs"
 kubectl edit configmap kube-proxy -n kube-system
 # 配置IPVS模式之后，删除之前所有的kube-proxy pod,重新启动
-#
+#-
 #
 # 安装 k8s weave网络管理插件（有其它网络插件选择）。创建时间比较长
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
@@ -204,17 +218,17 @@ kubectl edit configmap kube-proxy -n kube-system
 # 以下两种部署方式任选其一
 #
 # 1. 只启用 pod网络通信，网络隔离策略 功能
-kubectl apply -f kubeadm-kuberouter.yaml
+kubectl apply -f /ace/kubeadm-kuberouter.yaml
 #
 # 2. 启用 pod网络通信，网络隔离策略，服务代理 所有功能
 # 删除kube-proxy和其之前配置的服务代理
+kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{print $1}' | xargs kubectl delete pod -n kube-system
 #kubectl apply -f kubeadm-kuberouter-all-features.yaml
 #kubectl -n kube-system delete ds kube-proxy
 # 在每个节点上执行
 #docker run --privileged --net=host registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy-amd64:v1.10.2 kube-proxy --cleanup
 # 查看
-kubectl get pods --namespace kube-system
-kubectl get svc --namespace kube-system
+kubectl get svc --all-namespaces
 # 检查网络是否创建成功
 kubectl get pods --all-namespaces
 #
@@ -246,7 +260,8 @@ kubectl get pods --all-namespaces
 
 ##
 
-kubeadm join 172.1.0.2:6443 --token vzag2r.eywbupo7wcro5hbp \
-    --discovery-token-ca-cert-hash sha256:e92f0cd4dec73cab4af6a0e81b24d5ea9b1adbdd269d58447019063a32b5df85
+ kubeadm join 172.1.1.2:6443 --token 4lol35.4p0wa851d4kqwvl2 \
+    --discovery-token-ca-cert-hash sha256:5fc413405ad828c500a3ba64b43353ca7cab507a6680be1a44a052cb1c1c5cdd
+
 
 #
