@@ -130,7 +130,7 @@ docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 #
 # 查询指定版本 yum list kubelet --showduplicates | sort -r
 # 自动安装kubeadm kubelet kubectl
-yum install -y kubeadm-1.18.2-0
+yum install -y kubeadm-1.18.2-0 && \
 # 安装shell命令自动补全功能clu
 yum install bash-completion -y && \
 echo "source <(kubectl completion bash)" >> ~/.bashrc && \
