@@ -29,8 +29,9 @@ systemctl disable firewalld.service
 #
 # 安装iptables
 yum install -y iptables-services & \
-systemctl enable iptables & \
-systemctl start iptables
+#systemctl enable iptables & \
+#systemctl start iptables
+systemctl stop iptables.service && systemctl disable iptables.service
 #
 # 确保 iptables 工具不使用 nftables 后端,
 # https://kubernetes.io/zh/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#%E7%A1%AE%E4%BF%9D-iptables-%E5%B7%A5%E5%85%B7%E4%B8%8D%E4%BD%BF%E7%94%A8-nftables-%E5%90%8E%E7%AB%AF
@@ -133,9 +134,16 @@ docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 yum install -y kubeadm-1.18.2-0 && \
 # 安装shell命令自动补全功能clu
 yum install bash-completion -y && \
+source /usr/share/bash-completion/bash_completion && \
+source <(kubectl completion bash) && \
 echo "source <(kubectl completion bash)" >> ~/.bashrc && \
 systemctl enable kubelet && \
 systemctl start kubelet
+##
+# 更改节点的IP地址
+# vim /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
+# Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip=172.1.1.2"
+# systemctl daemon-reload && systemctl restart kubelet
 #
 # https://kubernetes.io/zh/docs/reference/setup-tools/kubeadm/kubeadm-init/
 kubeadm init \
@@ -218,7 +226,9 @@ kubectl edit configmap kube-proxy -n kube-system
 # 以下两种部署方式任选其一
 #
 # 1. 只启用 pod网络通信，网络隔离策略 功能
-kubectl apply -f /ace/kubeadm-kuberouter.yaml
+#
+# kubectl apply -f /ace/kubeadm-kuberouter.yaml
+kubectl apply -f https://raw.githubusercontent.com/ace-cn-team/ace-docker-projects/master/ace-server-projects/kubeadm-kuberouter.yaml
 #
 # 2. 启用 pod网络通信，网络隔离策略，服务代理 所有功能
 # 删除kube-proxy和其之前配置的服务代理
@@ -230,7 +240,8 @@ kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{
 # 查看
 kubectl get svc --all-namespaces
 # 检查网络是否创建成功
-kubectl get pods --all-namespaces
+kubectl get pods --all-namespaces -o wide
+kubectl get nodes --all-namespaces -o wide
 #
 #
 #
@@ -243,6 +254,8 @@ kubectl get pods --all-namespaces
 # systemctl restart kubelet
 # 开启单机集群模式，默认关闭
 # kubectl taint nodes --all node-role.kubernetes.io/master-
+# master 不参与POD负载
+# kubectl taint nodes k8s-master-1 node-role.kubernetes.io/master=:NoSchedule
 #
 # 添加worker节点
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#join-nodes
@@ -257,11 +270,15 @@ kubectl get pods --all-namespaces
 # 卸载
 # kubeadm reset -f && yum remove -y kubeadm.x86_64 kubectl.x86_64 kubectl.x86_64 kubernetes-cni.x86_64
 # journalctl -f -u kubelet
-
-##
-
- kubeadm join 172.1.1.2:6443 --token 4lol35.4p0wa851d4kqwvl2 \
-    --discovery-token-ca-cert-hash sha256:5fc413405ad828c500a3ba64b43353ca7cab507a6680be1a44a052cb1c1c5cdd
+#
+# 检查内部网络
+# kubectl run busybox --rm=true --image=busybox --restart=Never -it
 
 
+#
+#
+#
+#
+kubeadm join 172.1.1.2:6443 --token i0imoi.88vyvbhndwyir79o \
+    --discovery-token-ca-cert-hash sha256:0beae5ecb66df59390b7b8778e7ae8656044d2a14d33494c016aceb834652ec3
 #
