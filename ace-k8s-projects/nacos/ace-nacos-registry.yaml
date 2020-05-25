@@ -7,7 +7,7 @@ metadata:
     app: ace-nacos-registry
 spec:
   type: ClusterIP
-  clusterIP: 10.43.1.1
+  clusterIP: 10.96.1.1
   ports:
     - name: ace-nacos-registry
       port: 8848
@@ -38,7 +38,7 @@ spec:
           image: nacos/nacos-server:1.1.4
           resources:
             requests:
-              memory: 2G
+              memory: 512M
               cpu: 500m
           ports:
             - containerPort: 8848

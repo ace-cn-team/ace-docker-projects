@@ -249,6 +249,7 @@ kubectl get nodes --all-namespaces -o wide
 # [Service]中添加参数
 # Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=systemd --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 #
+# 在/usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf 配置集群节点IP地址 --node-ip
 # 添加参数之后，重新加载kubelet
 # systemctl daemon-reload
 # systemctl restart kubelet
