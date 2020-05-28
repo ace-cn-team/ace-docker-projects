@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    field.cattle.io/creatorId: user-n9z7g
+  creationTimestamp: "2020-05-28T06:47:10Z"
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    cattle.io/creator: norman
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:field.cattle.io/creatorId: {}
+          f:labels:
+            .: {}
+            f:cattle.io/creator: {}
+        f:spec:
+          f:accessModes: {}
+          f:capacity:
+            .: {}
+            f:storage: {}
+          f:hostPath:
+            .: {}
+            f:path: {}
+            f:type: {}
+          f:persistentVolumeReclaimPolicy: {}
+          f:volumeMode: {}
+      manager: Go-http-client
+      operation: Update
+      time: "2020-05-28T06:47:10Z"
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:status:
+          f:phase: {}
+      manager: kube-controller-manager
+      operation: Update
+      time: "2020-05-28T06:47:10Z"
+  name: ace-rocketmq-nameserv-pv
+  resourceVersion: "1633728"
+  selfLink: /api/v1/persistentvolumes/ace-rocketmq-nameserv-pv
+  uid: 4c3e9279-2304-41c8-b4f0-54b0c521a793
+spec:
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+  capacity:
+    storage: 128Gi
+  hostPath:
+    path: /k8s/ace-rocketmq-nameserv
+    type: DirectoryOrCreate
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: ace-rocketmq-nameserv-pvc
+  name: ace-rocketmq-nameserv-pvc
+  namespace: ace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Gi
+  storageClassName: ""
+  volumeMode: Filesystem
+  volumeName: ace-rocketmq-nameserv-pv
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ace-rocketmq-nameserv
+  name: ace-rocketmq-nameserv
+  namespace: ace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ace-rocketmq-nameserv
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ace-rocketmq-nameserv
+    spec:
+      containers:
+        - env:
+            - name: JAVA_OPT
+              value: -Duser.home=/opt
+            - name: JAVA_OPT_EXT
+              value: -server -Xms2G -Xmx2G -Xmn256m
+            - name: TZ
+              value: Asia/Shanghai
+          image: foxiswho/rocketmq:4.7.0
+          imagePullPolicy: IfNotPresent
+          name: ace-rocketmq-nameserv
+          volumeMounts:
+            - mountPath: /opt/store
+              name: vol1
+      restartPolicy: Always
+      volumes:
+        - name: vol1
+          persistentVolumeClaim:
+            claimName: ace-rocketmq-nameserv-pvc
