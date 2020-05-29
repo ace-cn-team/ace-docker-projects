@@ -45,7 +45,7 @@ spec:
             - name: TZ
               value: Asia/Shanghai
             - name: JAVA_OPTS
-              value: -Drocketmq.namesrv.addr=rocketmq-namesrv.ace.com:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false
+              value: -Drocketmq.namesrv.addr=rocketmq-namesrv.ace.com:9876 -Drocketmq.config.namesrvAddr=rocketmq-namesrv.ace.com:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false -Duser.home=/root -Xms512m -Xmx512m
           ports:
             - containerPort: 8080
           volumeMounts:
