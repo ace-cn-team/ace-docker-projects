@@ -36,10 +36,10 @@ spec:
           resources:
             limits:
               cpu: 450m
-              memory: 2000Mi
+              memory: 3000Mi
             requests:
               cpu: 400m
-              memory: 2000Mi
+              memory: 3000Mi
           env:
             - name: JAVA_OPT
               value: -Duser.home=/opt

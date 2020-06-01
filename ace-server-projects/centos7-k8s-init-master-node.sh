@@ -233,6 +233,7 @@ kubectl apply -f https://raw.githubusercontent.com/ace-cn-team/ace-docker-projec
 # 2. 启用 pod网络通信，网络隔离策略，服务代理 所有功能
 # 删除kube-proxy和其之前配置的服务代理
 kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{print $1}' | xargs kubectl delete pod -n kube-system
+kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{print $1}' | xargs kubectl delete pod -n kube-system
 #kubectl apply -f kubeadm-kuberouter-all-features.yaml
 #kubectl -n kube-system delete ds kube-proxy
 # 在每个节点上执行

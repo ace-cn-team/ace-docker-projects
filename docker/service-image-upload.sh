@@ -20,6 +20,6 @@ docker tag ${serviceName} ${serviceImageNameWithTimeTag}
 docker tag ${serviceName} ${serviceImageNameWithLatestTag}
 #docker login -u admin -p admin123 ${docker_hub_url}
 echo "上传镜像"
-docker push ${serviceImageNameWithTimeTag}
 docker push ${serviceImageNameWithLatestTag}
+docker push ${serviceImageNameWithTimeTag}
 #docker logout  ${docker_hub_url}
