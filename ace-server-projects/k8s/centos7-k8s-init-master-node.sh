@@ -10,11 +10,11 @@ yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 ## 列出可以使用的 kernel 包版本
 #yum list available --disablerepo=* --enablerepo=elrepo-kernel
 ## 安装指定的 kernel 版本：
-yum install -y kernel-lt-4.4.222-1.el7.elrepo --enablerepo=elrepo-kernel
+yum install -y kernel-lt-4.4.227-1.el7.elrepo --enablerepo=elrepo-kernel
 ## 查看系统可用内核
 cat /boot/grub2/grub.cfg | grep menuentry
 ## 设置开机从新内核启动
-grub2-set-default "CentOS Linux (4.4.222-1.el7.elrepo.x86_64) 7 (Core)"
+grub2-set-default "CentOS Linux (4.4.227-1.el7.elrepo.x86_64) 7 (Core)"
 ## 查看内核启动项
 grub2-editenv list
 #saved_entry=CentOS Linux (4.4.218-1.el7.elrepo.x86_64) 7 (Core)
@@ -131,7 +131,7 @@ docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 #
 # 查询指定版本 yum list kubelet --showduplicates | sort -r
 # 自动安装kubeadm kubelet kubectl
-yum install -y kubeadm-1.18.2-0 && \
+yum install -y kubeadm-1.18.4-0 && \
 # 安装shell命令自动补全功能clu
 yum install bash-completion -y && \
 source /usr/share/bash-completion/bash_completion && \
