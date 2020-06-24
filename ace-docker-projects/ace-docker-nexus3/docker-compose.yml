@@ -5,10 +5,10 @@ services:
     image: sonatype/nexus3:3.21.1
     container_name: ace-nexus3
     networks:
-      ace-network:
-        ipv4_address: ${ACE_NEXUS3_IP}
+      ace-devops-network:
+        ipv4_address: 172.20.0.7
     dns:
-      - ${ACE_DNS_IP}
+      - 172.18.0.2
     volumes:
     - ace-nexus3:/nexus-data
     ports:
@@ -24,11 +24,11 @@ services:
           cpus: '0.10'
           memory: 128M
 networks:
-  ace-network:
-    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+  ace-devops-network:
+    name: ace-devops-network
     ipam:
       config:
-        - subnet: ${ACE_PROJECT_SUB_NETWORK}
+        - subnet: 172.20.0.0/16
 
 volumes:
   ace-nexus3:

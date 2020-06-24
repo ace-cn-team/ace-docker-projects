@@ -111,18 +111,18 @@ EOF
 #
 #
 # 处理翻墙下载镜像的问题
-docker pull gotok8s/kube-apiserver:v1.18.2 && \
-docker pull gotok8s/kube-controller-manager:v1.18.2 && \
-docker pull gotok8s/kube-scheduler:v1.18.2 && \
-docker pull gotok8s/kube-proxy:v1.18.2 && \
+docker pull gotok8s/kube-apiserver:v1.18.4 && \
+docker pull gotok8s/kube-controller-manager:v1.18.4 && \
+docker pull gotok8s/kube-scheduler:v1.18.4 && \
+docker pull gotok8s/kube-proxy:v1.18.4 && \
 docker pull gotok8s/pause:3.2 &&\
 docker pull gotok8s/etcd:3.4.3-0 &&\
 docker pull gotok8s/coredns:1.6.7
 # 重命名
-docker tag docker.io/gotok8s/kube-apiserver:v1.18.2 k8s.gcr.io/kube-apiserver:v1.18.2 && \
-docker tag docker.io/gotok8s/kube-controller-manager:v1.18.2 k8s.gcr.io/kube-controller-manager:v1.18.2 && \
-docker tag docker.io/gotok8s/kube-scheduler:v1.18.2 k8s.gcr.io/kube-scheduler:v1.18.2 && \
-docker tag docker.io/gotok8s/kube-proxy:v1.18.2 k8s.gcr.io/kube-proxy:v1.18.2 && \
+docker tag docker.io/gotok8s/kube-apiserver:v1.18.4 k8s.gcr.io/kube-apiserver:v1.18.4 && \
+docker tag docker.io/gotok8s/kube-controller-manager:v1.18.4 k8s.gcr.io/kube-controller-manager:v1.18.4 && \
+docker tag docker.io/gotok8s/kube-scheduler:v1.18.4 k8s.gcr.io/kube-scheduler:v1.18.4 && \
+docker tag docker.io/gotok8s/kube-proxy:v1.18.4 k8s.gcr.io/kube-proxy:v1.18.4 && \
 docker tag docker.io/gotok8s/pause:3.2 k8s.gcr.io/pause:3.2 && \
 docker tag docker.io/gotok8s/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0 && \
 docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
@@ -239,7 +239,7 @@ kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{
 # 在每个节点上执行
 #docker run --privileged --net=host registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy-amd64:v1.10.2 kube-proxy --cleanup
 # 查看
-kubectl get svc --all-namespaces
+kubectl get svc --all-namespaces -o wide
 # 检查网络是否创建成功
 kubectl get pods --all-namespaces -o wide
 kubectl get nodes --all-namespaces -o wide
@@ -281,6 +281,6 @@ kubectl get nodes --all-namespaces -o wide
 #
 #
 #
-kubeadm join 172.1.1.2:6443 --token i0imoi.88vyvbhndwyir79o \
-    --discovery-token-ca-cert-hash sha256:0beae5ecb66df59390b7b8778e7ae8656044d2a14d33494c016aceb834652ec3
+kubeadm join 172.1.1.2:6443 --token uk3uxe.sl7ldnaafkhtsqcw \
+    --discovery-token-ca-cert-hash sha256:717fdbf8e18bd1da89c6516b6c37142d301079c67f772b833d791536cdb78178
 #
