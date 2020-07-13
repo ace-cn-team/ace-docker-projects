@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  ace-redis-common:
+    image: rancher/rancher:v2.4.3-rc5
+    container_name: ace-rancher
+    networks:
+      ace-network:
+        ipv4_address: 172.18.0.20
+    dns:
+      - ${ACE_DNS_IP}
+    ports:
+      - 80:80
+      - 443:443
+    restart: always # 如果容器内应用退出了，尝试重启
+
+networks:
+  ace-network:
+    name: ${ACE_PROJECT_SUB_NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${ACE_PROJECT_SUB_NETWORK}
