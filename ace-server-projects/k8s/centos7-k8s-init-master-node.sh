@@ -19,16 +19,18 @@ grub2-set-default "CentOS Linux (4.4.227-1.el7.elrepo.x86_64) 7 (Core)"
 grub2-editenv list
 #saved_entry=CentOS Linux (4.4.218-1.el7.elrepo.x86_64) 7 (Core)
 # 查看所有内核
-rpm -qa |grep kernel
+rpm -qa | grep kernel
 # 删除无用内核
 #
 #
 # 禁用firewall
-systemctl stop firewalld.service & \
+systemctl stop firewalld.service &
+\
 systemctl disable firewalld.service
 #
 # 安装iptables
-yum install -y iptables-services & \
+yum install -y iptables-services &
+\
 #systemctl enable iptables & \
 #systemctl start iptables
 systemctl stop iptables.service && systemctl disable iptables.service
@@ -48,7 +50,7 @@ yum -y install docker-ce-19.03.3-3.el7
 
 # Setup daemon.
 mkdir -p /etc/docker
-cat > /etc/docker/daemon.json <<EOF
+cat >/etc/docker/daemon.json <<EOF
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
   "log-driver": "json-file",
@@ -61,36 +63,40 @@ cat > /etc/docker/daemon.json <<EOF
   ]
 }
 EOF
-systemctl daemon-reload & \
-systemctl restart docker & \
-systemctl enable docker.service & \
+systemctl daemon-reload &
+\
+systemctl restart docker &
+\
+systemctl enable docker.service &
+\
 systemctl start docker.service
 #
 # 设置转发
-echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
 #
 # 关闭swap,k8s安装限制
 #第二步修改配置文件 -
 # vim /etc/fstab
 #删除swap相关行 /mnt/swap swap swap defaults 0 0 这一行或者注释掉这一行
-echo "vm.swappiness = 0">> /etc/sysctl.conf
-swapoff -a & \
+echo "vm.swappiness = 0" >>/etc/sysctl.conf
+swapoff -a &
+\
 sysctl -p
 #
 # 将 SELinux 设置为 permissive 模式（相当于将其禁用）
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 # 一些 RHEL/CentOS 7 的用户曾经遇到过问题：由于 iptables 被绕过而导致流量无法正确路由的问题。您应该确保 在 sysctl 配置中的
-cat <<EOF >  /etc/sysctl.d/k8s.conf
+cat <<EOF >/etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 sysctl --system
 #
 # 开启IPVS服务
-yum -y install ipvsadm  ipset
+yum -y install ipvsadm ipset
 # 永久生效
-cat > /etc/sysconfig/modules/ipvs.modules <<EOF
+cat >/etc/sysconfig/modules/ipvs.modules <<EOF
 modprobe -- ip_vs
 modprobe -- ip_vs_rr
 modprobe -- ip_vs_wrr
@@ -99,7 +105,7 @@ modprobe -- nf_conntrack_ipv4
 EOF
 #
 # 安装k8s镜像使用阿里云
-cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+cat <<EOF >/etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
@@ -109,20 +115,29 @@ repo_gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 #
-#
+# 查看对应版本的镜像
+# kubeadm config images list --kubernetes-version=v1.18.5
 # 处理翻墙下载镜像的问题
-docker pull gotok8s/kube-apiserver:v1.18.4 && \
-docker pull gotok8s/kube-controller-manager:v1.18.4 && \
-docker pull gotok8s/kube-scheduler:v1.18.4 && \
-docker pull gotok8s/kube-proxy:v1.18.4 && \
-docker pull gotok8s/pause:3.2 &&\
-docker pull gotok8s/etcd:3.4.3-0 &&\
-docker pull gotok8s/coredns:1.6.7
+kubeVersion="v1.18.5" && \
+pauseVersion="3.2" && \
+etcd="3.4.3-0" && \
+coredns="1.6.7" && \
+docker pull gotok8s/kube-apiserver:${kubeVersion} && \
+docker pull gotok8s/kube-controller-manager:${kubeVersion} && \
+docker pull gotok8s/kube-scheduler:${kubeVersion} && \
+docker pull gotok8s/kube-proxy:${kubeVersion} && \
+docker pull gotok8s/pause:${pauseVersion} && \
+docker pull gotok8s/etcd:${etcd} && \
+docker pull gotok8s/coredns:${coredns}
 # 重命名
-docker tag docker.io/gotok8s/kube-apiserver:v1.18.4 k8s.gcr.io/kube-apiserver:v1.18.4 && \
-docker tag docker.io/gotok8s/kube-controller-manager:v1.18.4 k8s.gcr.io/kube-controller-manager:v1.18.4 && \
-docker tag docker.io/gotok8s/kube-scheduler:v1.18.4 k8s.gcr.io/kube-scheduler:v1.18.4 && \
-docker tag docker.io/gotok8s/kube-proxy:v1.18.4 k8s.gcr.io/kube-proxy:v1.18.4 && \
+kubeVersion="v1.18.5" && \
+pauseVersion="3.2" && \
+etcd="3.4.3-0" && \
+coredns="1.6.7" && \
+docker tag docker.io/gotok8s/kube-apiserver:${kubeVersion} k8s.gcr.io/kube-apiserver:${kubeVersion} && \
+docker tag docker.io/gotok8s/kube-controller-manager:${kubeVersion} k8s.gcr.io/kube-controller-manager:${kubeVersion} && \
+docker tag docker.io/gotok8s/kube-scheduler:${kubeVersion} k8s.gcr.io/kube-scheduler:${kubeVersion} && \
+docker tag docker.io/gotok8s/kube-proxy:${kubeVersion} k8s.gcr.io/kube-proxy:${kubeVersion} && \
 docker tag docker.io/gotok8s/pause:3.2 k8s.gcr.io/pause:3.2 && \
 docker tag docker.io/gotok8s/etcd:3.4.3-0 k8s.gcr.io/etcd:3.4.3-0 && \
 docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
@@ -130,13 +145,15 @@ docker tag docker.io/gotok8s/coredns:1.6.7 k8s.gcr.io/coredns:1.6.7
 #
 #
 # 查询指定版本 yum list kubelet --showduplicates | sort -r
-# 自动安装kubeadm kubelet kubectl
-yum install -y kubeadm-1.18.4-0 && \
+# 自动安装 kubeadm kubelet kubectl
+yum install -y kubectl-1.18.5-0 && \
+yum install -y kubelet-1.18.5-0 && \
+yum install -y kubeadm-1.18.5-0
 # 安装shell命令自动补全功能clu
 yum install bash-completion -y && \
 source /usr/share/bash-completion/bash_completion && \
 source <(kubectl completion bash) && \
-echo "source <(kubectl completion bash)" >> ~/.bashrc && \
+echo "source <(kubectl completion bash)" >>~/.bashrc && \
 systemctl enable kubelet && \
 systemctl start kubelet
 ##
@@ -149,7 +166,9 @@ systemctl start kubelet
 kubeadm init \
 --apiserver-advertise-address=172.1.1.2 \
 --apiserver-bind-port=6443 \
---pod-network-cidr=11.8.0.0/16
+--control-plane-endpoint=k8s-controller.ace.com \
+--pod-network-cidr=11.8.0.0/16 \
+--upload-certs
 #--service-cidr 10.96.0.0/16
 
 # kubeadm init 参数
@@ -233,7 +252,6 @@ kubectl apply -f https://raw.githubusercontent.com/ace-cn-team/ace-docker-projec
 # 2. 启用 pod网络通信，网络隔离策略，服务代理 所有功能
 # 删除kube-proxy和其之前配置的服务代理
 kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{print $1}' | xargs kubectl delete pod -n kube-system
-kubectl get pods -n kube-system -l k8s-app=kube-proxy | grep kube-proxy | awk '{print $1}' | xargs kubectl delete pod -n kube-system
 #kubectl apply -f kubeadm-kuberouter-all-features.yaml
 #kubectl -n kube-system delete ds kube-proxy
 # 在每个节点上执行
@@ -276,11 +294,24 @@ kubectl get nodes --all-namespaces -o wide
 # 检查内部网络
 # kubectl run busybox --rm=true --image=busybox --restart=Never -it
 
+#
+# 权限问题
+# kubectl create clusterrolebinding test:anonymous --clusterrole=cluster-admin --user=system:anonymous
+#
+# You can now join any number of the control-plane node running the following command on each as root:
 
+ kubeadm join k8s-controller.ace.com:6443 --token uu1d9g.barwufuynfebsv5j \
+    --discovery-token-ca-cert-hash sha256:39e146f6944828eab4d97272839b4af0a3265337b6224341442dacfbbe71ea2b \
+    --control-plane --certificate-key 7da78a85343e85edae8881685536a4d9d9fcb4e42686eefd544c7cf2c8db9eb9
+
+# Please note that the certificate-key gives access to cluster sensitive data, keep it secret!
+# As a safeguard, uploaded-certs will be deleted in two hours; If necessary, you can use
+# "kubeadm init phase upload-certs --upload-certs" to reload certs afterward.
 #
-#
-#
-#
-kubeadm join 172.1.1.2:6443 --token uk3uxe.sl7ldnaafkhtsqcw \
-    --discovery-token-ca-cert-hash sha256:717fdbf8e18bd1da89c6516b6c37142d301079c67f772b833d791536cdb78178
-#
+# Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join k8s-controller.ace.com:6443 --token uu1d9g.barwufuynfebsv5j \
+    --discovery-token-ca-cert-hash sha256:39e146f6944828eab4d97272839b4af0a3265337b6224341442dacfbbe71ea2b
+ --v=10
+
+# rm -rf /etc/kubernetes/ && pid=$(netstat -lnap|grep 10250|awk '{print $7}'|awk '{print $1}'|cut -d"/" -f1) && kill ${pid}

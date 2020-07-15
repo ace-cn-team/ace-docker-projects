@@ -1,4 +1,5 @@
 vboxmanage controlvm controller-1 acpipowerbutton
+vboxmanage controlvm controller-2 acpipowerbutton
 vboxmanage controlvm worker-1 acpipowerbutton
 vboxmanage controlvm worker-2 acpipowerbutton
 vboxmanage controlvm devops-server acpipowerbutton
