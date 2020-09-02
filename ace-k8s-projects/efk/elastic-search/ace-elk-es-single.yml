@@ -1,0 +1,133 @@
+##
+# 部署单机es服务
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: ace-elk-es
+  namespace: ace
+  labels:
+    app: ace-elk-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/name: "ace-elk-es"
+spec:
+  type: ClusterIP
+  clusterIP: 10.96.1.22
+  ports:
+    - port: 9200
+      protocol: TCP
+      targetPort: 9200
+  selector:
+    app: ace-elk-es
+---
+# RBAC authn and authz
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ace-elk-es
+  namespace: ace
+  labels:
+    app: ace-elk-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ace-elk-es
+  labels:
+    app: ace-elk-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "services"
+      - "namespaces"
+      - "endpoints"
+    verbs:
+      - "get"
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: ace
+  name: ace-elk-es
+  labels:
+    app: ace-elk-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+subjects:
+  - kind: ServiceAccount
+    name: ace-elk-es
+    namespace: ace
+    apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: ace-elk-es
+  apiGroup: ""
+---
+# Elasticsearch deployment itself
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ace-elk-es
+  namespace: ace
+  labels:
+    app: ace-elk-es
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  serviceName: ace-elk-es
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ace-elk-es
+  template:
+    metadata:
+      labels:
+        app: ace-elk-es
+        kubernetes.io/cluster-service: "true"
+    spec:
+      serviceAccountName: ace-elk-es
+      containers:
+        - image: elasticsearch:7.9.0
+          name: ace-elk-es
+          resources:
+            # need more cpu upon initialization, therefore burstable class
+            limits:
+              cpu: 1000m
+            requests:
+              cpu: 100m
+          ports:
+            - containerPort: 9200  #容器端口
+              protocol: TCP
+            - containerPort: 9300
+              protocol: TCP
+          volumeMounts:
+            - name: ace-elk-es
+              mountPath: /home/elastic-search/data #容器内挂载的路径
+          env:
+            - name: "cluster.name"
+              value: "ace-elk-es-cluster"
+            - name: "node.name"
+              value: "es1"
+#            - name: "cluster.initial_master_nodes"
+#              value: "node-1"
+            - name: "discovery.type"
+              value: "single-node"
+      volumes:
+        - name: ace-elk-es #挂载pvc作为es存储，重启pod后数据保留。
+          persistentVolumeClaim:
+            claimName: pvc-elk
+      # Elasticsearch requires vm.max_map_count to be at least 262144.
+      # If your OS already sets up this number to a higher value, feel free
+      # to remove this init container.
+      initContainers:
+        - image: alpine:3.7
+          command: ["/sbin/sysctl", "-w", "vm.max_map_count=262144"]
+          name: ace-elk-es-initializer
+          securityContext:
+            privileged: true

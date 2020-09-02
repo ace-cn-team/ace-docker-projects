@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ace-elk-kibana-config
+  labels:
+    app: ace-elk-kibana-config
+data:
+  ace-elk-kibana-config: |-
+    server.name: "ace-elk-kibana"
+    server.host: "0.0.0.0"
+    server.port: 5601
+    elasticsearch.hosts: ["http://ace-elk-es.ace.com:9200/"]
+    elasticsearch.requestTimeout: 120000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ace-elk-kibana
+  name: ace-elk-kibana
+  namespace: ace
+spec:
+  type: ClusterIP
+  clusterIP: 10.96.1.23
+  ports:
+    - port: 5601
+      protocol: TCP
+      targetPort: 5601
+  selector:
+    app: ace-elk-kibana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ace-elk-kibana
+  name: ace-elk-kibana
+  namespace: ace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ace-elk-kibana
+  template:
+    metadata:
+      labels:
+        app: ace-elk-kibana
+    spec:
+      containers:
+        - name: ace-elk-kibana
+          image: kibana:7.9.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5601
+              protocol: TCP
+          volumeMounts:
+            - name: ace-elk-kibana-config
+              mountPath: /usr/share/kibana/config/
+      volumes:
+        - name: ace-elk-kibana-config
+          configMap:
+            name: ace-elk-kibana-config
+            items:
+              - key: ace-elk-kibana-config
+                path: kibana.yml
