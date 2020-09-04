@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ace-region-base-api-web
+  labels:
+    app: ace-region-base-api-web
+spec:
+  type: ClusterIP
+  clusterIP: 10.100.0.8
+  ports:
+    - port: 8080
+  #      targetPort: 6379
+  #      nodePort: 30379
+  selector:
+    app: ace-region-base-api-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ace-region-base-api-web
+  labels:
+    app: ace-region-base-api-web
+spec:
+  #securityContext:
+  #privileged: true
+  #serviceName: ace-region-base-api-web
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ace-region-base-api-web
+  template:
+    metadata:
+      labels:
+        app: ace-region-base-api-web
+          #net:
+          #core:
+        #somaxconn=511:
+    spec:
+      containers:
+        - name: ace-region-base-api-web
+          image: nexus3.ace.com:8082/ace-region-base-api-web:latest
+          imagePullPolicy: Always
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: registry-secret
+      restartPolicy: Always
